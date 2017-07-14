@@ -39,6 +39,17 @@ def pcl_callback(pcl_msg):
     # TODO: Extract inliers and outliers
     cloud_objects = cloud_filtered.extract(inliers, negative=True)
     cloud_table = cloud_filtered.extract(inliers, negative=False)
+
+    #The cloud_objects also contains the edge of the table
+    #To remove the edge, I am applying passthrough filter in Y direction
+    passthrough = cloud_objects.make_passthrough_filter()
+    filter_axis = 'y'
+    passthrough.set_filter_field_name(filter_axis)
+    axis_min = -3. #can still be optimised
+    axis_max = -1.4 #If y>-1.4, the edge shows up
+    passthrough.set_filter_limits(axis_min, axis_max)
+    cloud_objects = passthrough.filter()
+
     # Much like the previous filters, we start by creating a filter object: 
     #outlier_filter = cloud_in.make_statistical_outlier_filter()
     # Set the number of neighboring points to analyze for any given point
